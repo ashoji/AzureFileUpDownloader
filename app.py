@@ -31,13 +31,16 @@ msal_app = ConfidentialClientApplication(
     client_credential=CLIENT_SECRET  # 追加: クライアントシークレットの設定
 )
 
+def get_container_client():
+    blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
+    return blob_service_client.get_container_client(CONTAINER_NAME)
+
 @app.route("/")
 def index():
     logging.info("Accessing index route")
     if not session.get("user"):
         return redirect(url_for("login"))
-    blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
-    container_client = blob_service_client.get_container_client(CONTAINER_NAME)
+    container_client = get_container_client()  # 変更: ヘルパー関数を使用
     blob_list = container_client.list_blobs()
     return render_template("index.html", files=[b.name for b in blob_list])
 
@@ -79,8 +82,7 @@ def download():
     filename = request.args.get("filename")
     if not filename:
         return redirect(url_for("index"))
-    blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
-    container_client = blob_service_client.get_container_client(CONTAINER_NAME)
+    container_client = get_container_client()  # 変更: ヘルパー関数を使用
     blob_data = container_client.download_blob(filename).readall()
     return send_file(BytesIO(blob_data), as_attachment=True, download_name=filename)
 
@@ -92,8 +94,7 @@ def upload():
     file = request.files.get("file")
     if not file:
         return redirect(url_for("index"))
-    blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
-    container_client = blob_service_client.get_container_client(CONTAINER_NAME)
+    container_client = get_container_client()  # 変更: ヘルパー関数を使用
     container_client.upload_blob(file.filename, file.read(), overwrite=True)
     return redirect(url_for("index"))
 
