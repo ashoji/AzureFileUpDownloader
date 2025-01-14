@@ -14,14 +14,29 @@
         </div>
     </header>
     <h1>ファイル一覧</h1>
-    <ul>
-        {% for f in files %}
-        <li>
-            {{ f }} |
-            <a href="{{ url_for('download', filename=f) }}">ダウンロード</a>
-        </li>
-        {% endfor %}
-    </ul>
+    
+    <!-- フラッシュメッセージの表示を追加 -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    
+    <form action="{{ url_for('delete') }}" method="POST">
+        <ul>
+            {% for f in files %}
+            <li>
+                <input type="checkbox" name="filenames" value="{{ f }}"> {{ f }} |
+                <a href="{{ url_for('download', filename=f) }}">ダウンロード</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <input type="submit" value="選択したファイルを削除">
+    </form>
 
     <h2>ファイルアップロード</h2>
     <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">

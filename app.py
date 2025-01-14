@@ -1,6 +1,6 @@
 import os
 import uuid
-from flask import Flask, request, redirect, session, url_for, render_template, send_file
+from flask import Flask, request, redirect, session, url_for, render_template, send_file, flash  # 追加: フラッシュメッセージのため
 from msal import ConfidentialClientApplication  # 変更: PublicClientApplicationからConfidentialClientApplicationへ
 # from msal import PublicClientApplication  # 削除
 from azure.storage.blob import BlobServiceClient
@@ -107,6 +107,26 @@ def upload():
         return redirect(url_for("index"))
     container_client = get_container_client()  # 変更: ヘルパー関数を使用
     container_client.upload_blob(file.filename, file.read(), overwrite=True)
+    return redirect(url_for("index"))
+
+@app.route("/delete", methods=["POST"])
+def delete():
+    logging.info("Accessing delete route")
+    if not session.get("user"):
+        return redirect(url_for("login"))
+    filenames = request.form.getlist("filenames")
+    if not filenames:
+        flash("削除するファイルが選択されていません。")  # フラッシュメッセージを追加
+        return redirect(url_for("index"))
+    container_client = get_container_client()
+    for filename in filenames:
+        try:
+            container_client.delete_blob(filename)
+            logging.info(f"Deleted file: {filename}")
+        except Exception as e:
+            logging.error(f"Error deleting file {filename}: {e}")
+            flash(f"{filename} の削除に失敗しました。")
+    flash("選択したファイルを削除しました。")
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
