@@ -42,7 +42,8 @@ def index():
         return redirect(url_for("login"))
     container_client = get_container_client()  # 変更: ヘルパー関数を使用
     blob_list = container_client.list_blobs()
-    return render_template("index.html", files=[b.name for b in blob_list])
+    user_name = session["user"].get("name")  # 追加: ユーザー名の取得
+    return render_template("index.html", files=[b.name for b in blob_list], user_name=user_name)
 
 @app.route("/login")
 def login():
@@ -73,6 +74,16 @@ def authorized():
     else:
         logging.error("No code parameter found in request")
     return redirect(url_for("index"))
+
+@app.route("/logout")
+def logout():
+    session.clear()  # セッションを完全にクリア
+    logging.info("User logged out")  # ログアウトのログを追加
+    logout_url = (
+        f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/logout"
+        f"?post_logout_redirect_uri={url_for('index', _external=True)}"
+    )  # Azure AD のログアウト URL
+    return redirect(logout_url)
 
 @app.route("/download")
 def download():

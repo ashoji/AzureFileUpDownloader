@@ -5,6 +5,14 @@
     <title>Azure Blob File Manager</title>
 </head>
 <body>
+    <header>
+        <div style="text-align: right;">
+            {% if user_name %}
+                <span>こんにちは, {{ user_name }}さん</span>
+                <a href="{{ url_for('logout') }}">ログアウト</a>
+            {% endif %}
+        </div>
+    </header>
     <h1>ファイル一覧</h1>
     <ul>
         {% for f in files %}
