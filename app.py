@@ -8,6 +8,9 @@ from io import BytesIO
 from dotenv import load_dotenv
 import logging
 
+# 認証を一時的にオフにするためのフラグ
+disable_auth = os.getenv("DISABLE_AUTH", "False").lower() in ("true", "1", "t")  # 変更: 環境変数から認証無効フラグを設定
+
 # ロギングの設定を追加
 logging.basicConfig(level=logging.DEBUG)
 
@@ -20,7 +23,8 @@ TENANT_ID = os.getenv("TENANT_ID")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")  # 追加
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
-REDIRECT_PATH = "/callback"
+REDIRECT_PATH = os.getenv("REDIRECT_PATH", "/callback")  # 変更: リダイレクトパスを環境変数から取得
+REDIRECT_URI = os.getenv("REDIRECT_URI", f"http://localhost:5000{REDIRECT_PATH}")  # 追加: リダイレクト URI を環境変数から設定
 SCOPE = ["User.Read"]
 CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 CONTAINER_NAME = os.getenv("AZURE_CONTAINER_NAME")
@@ -38,18 +42,18 @@ def get_container_client():
 @app.route("/")
 def index():
     logging.info("Accessing index route")
-    if not session.get("user"):
+    if not disable_auth and not session.get("user"):  # 変更: 認証無効フラグを考慮
         return redirect(url_for("login"))
     container_client = get_container_client()  # 変更: ヘルパー関数を使用
     blob_list = container_client.list_blobs()
-    user_name = session["user"].get("name")  # 追加: ユーザー名の取得
+    user_name = session["user"].get("name") if session.get("user") else "Guest"  # 変更: 認証無効時のユーザー名
     return render_template("index.html", files=[b.name for b in blob_list], user_name=user_name)
 
 @app.route("/login")
 def login():
     logging.info("Accessing login route")
     auth_url = msal_app.get_authorization_request_url(
-        SCOPE, redirect_uri=request.url_root.rstrip('/') + REDIRECT_PATH
+        SCOPE, redirect_uri=REDIRECT_URI  # 変更: 環境変数から取得したリダイレクト URI を使用
     )
     return redirect(auth_url)
 
@@ -61,7 +65,7 @@ def authorized():
             result = msal_app.acquire_token_by_authorization_code(
                 request.args["code"],
                 scopes=SCOPE,
-                redirect_uri=request.url_root.rstrip('/') + REDIRECT_PATH
+                redirect_uri=REDIRECT_URI  # 変更: 環境変数から取得したリダイレクト URI を使用
             )
             logging.debug(f"Token acquisition result: {result}")  # 追加: 認証結果をログ出力
             if "id_token" in result:
@@ -88,7 +92,7 @@ def logout():
 @app.route("/download")
 def download():
     logging.info("Accessing download route")
-    if not session.get("user"):
+    if not disable_auth and not session.get("user"):  # 変更: 認証無効フラグを考慮
         return redirect(url_for("login"))
     filename = request.args.get("filename")
     if not filename:
@@ -100,7 +104,7 @@ def download():
 @app.route("/upload", methods=["POST"])
 def upload():
     logging.info("Accessing upload route")
-    if not session.get("user"):
+    if not disable_auth and not session.get("user"):  # 変更: 認証無効フラグを考慮
         return redirect(url_for("login"))
     file = request.files.get("file")
     if not file:
@@ -112,7 +116,7 @@ def upload():
 @app.route("/delete", methods=["POST"])
 def delete():
     logging.info("Accessing delete route")
-    if not session.get("user"):
+    if not disable_auth and not session.get("user"):  # 変更: 認証無効フラグを考慮
         return redirect(url_for("login"))
     filenames = request.form.getlist("filenames")
     if not filenames:
