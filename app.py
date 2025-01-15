@@ -7,6 +7,7 @@ from azure.storage.blob import BlobServiceClient
 from io import BytesIO
 from dotenv import load_dotenv
 import logging
+from azure.identity import DefaultAzureCredential  # 追加
 
 # 認証を一時的にオフにするためのフラグ
 disable_auth = os.getenv("DISABLE_AUTH", "False").lower() in ("true", "1", "t")  # 変更: 環境変数から認証無効フラグを設定
@@ -26,7 +27,7 @@ AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 REDIRECT_PATH = os.getenv("REDIRECT_PATH", "/callback")  # 変更: リダイレクトパスを環境変数から取得
 REDIRECT_URI = os.getenv("REDIRECT_URI", f"http://localhost:5000{REDIRECT_PATH}")  # 追加: リダイレクト URI を環境変数から設定
 SCOPE = ["User.Read"]
-CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+CONNECTION_STRING = None  # 変更: 既存の接続文字列は不要
 CONTAINER_NAME = os.getenv("AZURE_CONTAINER_NAME")
 
 msal_app = ConfidentialClientApplication(
@@ -36,7 +37,15 @@ msal_app = ConfidentialClientApplication(
 )
 
 def get_container_client():
-    blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
+    connection_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    if connection_str:
+        blob_service_client = BlobServiceClient.from_connection_string(connection_str)
+    else:
+        credential = DefaultAzureCredential()
+        blob_service_client = BlobServiceClient(
+            account_url=f"os.getenv('AZURE_STORAGE_ACCOUNT_NAME')",
+            credential=credential
+        )
     return blob_service_client.get_container_client(CONTAINER_NAME)
 
 @app.route("/")
