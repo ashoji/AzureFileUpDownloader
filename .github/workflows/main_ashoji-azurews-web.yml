@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App - ashoji-azurews-web
 on:
   push:
     branches:
-      - managedid
+      - main
   workflow_dispatch:
 
 jobs:
