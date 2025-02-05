@@ -10,7 +10,7 @@ param storageAccountContainer string = 'cont'
 param appServicePlanName string = 'AppServicePlan'
 
 @description('Web App の名前（グローバルで一意）')
-param webAppNamePrefix string
+param webAppNamePrefix string = 'webapplin'
 
 // Storage Account のモジュールを呼び出す
 module storageModule './storage.bicep' = {
