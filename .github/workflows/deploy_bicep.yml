@@ -14,6 +14,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # これを追加
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
