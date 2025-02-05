@@ -15,7 +15,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write  # これを追加
+      id-token: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,5 +30,5 @@ jobs:
       - name: Deploy Bicep template
         uses: azure/arm-deploy@v1
         with:
-            resourceGroupName: $resourceGroupName
+            resourceGroupName: ${{env.resourceGroupName}}
             template: 'deply/azuredeploy.bicep'
