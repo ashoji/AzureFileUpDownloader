@@ -1,6 +1,6 @@
 param location string = resourceGroup().location
 param appServicePlanName string = 'AppServicePlan'
-param webAppNamePrefix string = 'WebApp'
+param webAppName string
 param storageAccountName string
 param storageContainerName string = 'container'
 param linuxFxVersion string = 'PYTHON|3.11'
@@ -20,7 +20,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   }
 }
 
-var webAppName = '${webAppNamePrefix}-${uniqueString(resourceGroup().id)}'
+// var webAppName = '${webAppNamePrefix}-${uniqueString(resourceGroup().id)}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: storageAccountName
@@ -58,5 +58,3 @@ resource webApp 'Microsoft.Web/sites@2024-04-01' = {
 }
 
 output webAppUrl string = webApp.properties.defaultHostName
-// 追加: Bicep で作成した WebApp の名前を出力
-output webAppName string = webAppName

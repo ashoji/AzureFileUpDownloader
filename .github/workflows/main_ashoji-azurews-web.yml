@@ -1,6 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+# アプリ登録は必須
 
 name: Build and deploy Python app to Azure Web App
 
@@ -71,22 +72,46 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      # Bicep テンプレートをデプロイし、outputs から webAppName を取得
-      - name: Deploy Bicep template and get WebApp name
+
+      # Bicep テンプレートをデプロイし、outputs から webAppName と storageAccountName を取得
+      - name: Deploy Bicep template and get outputs
         id: deploy_bicep
         run: |
           outputs=$(az deployment group create \
             --resource-group ${{ env.resourceGroupName }} \
-            --template-file deply/azuredeploy.bicep \
+            --template-file deploy/azuredeploy.bicep \
             --query "properties.outputs" -o json)
           echo "Deployment outputs: $outputs"
-          WEBAPP_NAME=$(echo $outputs | jq -r '.webAppName.value')
-          echo "WEBAPP_NAME=${WEBAPP_NAME}" >> $GITHUB_ENV
+          STORAGE_ACCOUNT_NAME=$(echo $outputs | jq -r '.storageAccountName.value')
+          echo "STORAGE_ACCOUNT_NAME=${STORAGE_ACCOUNT_NAME}" >> $GITHUB_ENV
+
+      # ストレージアカウントの接続文字列を取得
+      - name: Get storage account connection string
+        id: get_connection_string
+        run: |
+          AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
+            --name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --resource-group ${{ env.resourceGroupName }} \
+            --query connectionString -o tsv)
+          echo "AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}" >> $GITHUB_ENV
+
       # Azure Web Apps にデプロイ
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: ${{ env.WEBAPP_NAME }}
+          app-name: ${{ secrets.WEBAPP_NAME }}
           slot-name: 'Production'
 
+      # 環境変数を設定
+      - name: 'Set environment variables'
+        run: |
+          az webapp config appsettings set --name ${{ secrets.WEBAPP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
+            DISABLE_AUTH=false \
+            REDIRECT_URI=${{ secrets.REDIRECT_URI }} \
+            FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} \
+            CLIENT_ID=${{ secrets.CLIENT_ID }} \
+            TENANT_ID=${{ secrets.TENANT_ID }} \
+            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
+            AZURE_STORAGE_CONNECTION_STRING=${{ env.AZURE_STORAGE_CONNECTION_STRING }} \
+            AZURE_CONTAINER_NAME=${{vars.AZURE_CONTAINER_NAME}}

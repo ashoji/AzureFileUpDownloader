@@ -3,5 +3,6 @@ using './azuredeploy.bicep'
 param storageAccountNamePrefix = 'storage'
 param storageAccountContainer = 'cont'
 param appServicePlanName = 'AppServicePlan'
-param webAppNamePrefix = 'webapplin'
+param webAppName = 'webapplin-4dcnaw7p7euem
+'
 
