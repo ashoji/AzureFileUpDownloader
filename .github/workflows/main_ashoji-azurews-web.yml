@@ -96,7 +96,7 @@ jobs:
         run: |
           az webapp config appsettings set --name ${{ vars.WEB_APP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
             DISABLE_AUTH=${{ env.isAuth }} \
-            REDIRECT_URI=${{ vars.REDIRECT_URI }} \
+            REDIRECT_URI='${{ vars.REDIRECT_URI }}' \
             FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} \
             CLIENT_ID=${{ secrets.CLIENT_ID }} \
             TENANT_ID=${{ secrets.TENANT_ID }} \
