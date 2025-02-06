@@ -4,7 +4,7 @@ param location string = resourceGroup().location
 @description('Storage Account の名前（グローバルで一意）')
 param storageAccountNamePrefix string = 'storage'
 
-param storageAccountContainer string = 'cont'
+param storageAccountContainer string = 'container'
 
 @description('App Service プラン名')
 param appServicePlanName string = 'AppServicePlan'
@@ -17,6 +17,7 @@ module storageModule './storage.bicep' = {
   name: 'deployStorage'
   params: {
     location: location
+    storageContainerName: storageAccountContainer
     storageAccountNamePrefix: storageAccountNamePrefix
   }
 }
