@@ -80,19 +80,23 @@ jobs:
           az deployment group create \
             --resource-group ${{ env.resourceGroupName }} \
             --template-file deploy/azuredeploy.bicep
+            --parameters \
+              webAppName=${{ vars.WEB_APP_NAME }} \
+              storageAccountNamePrefix=${{ vars.STORAGE_ACCOUNT_NAME_PREFIX }} \
+              storageAccountContainer=${{ vars.STORAGE_ACCOUNT_CONTAINER }} 
           
       # Azure Web Apps にデプロイ
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: ${{ secrets.WEB_APP_NAME }}
+          app-name: ${{ vars.WEB_APP_NAME }}
           slot-name: 'Production'
 
       # 環境変数を設定
       - name: 'Set environment variables'
         run: |
-          az webapp config appsettings set --name ${{ secrets.WEB_APP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
+          az webapp config appsettings set --name ${{ vars.WEB_APP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
             DISABLE_AUTH=false \
             REDIRECT_URI=${{ secrets.REDIRECT_URI }} \
             FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} \
