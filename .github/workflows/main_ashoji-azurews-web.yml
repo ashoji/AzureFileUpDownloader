@@ -6,7 +6,7 @@
 name: Build and deploy Python app to Azure Web App
 
 env:
-    resourceGroupName : fileupdownloder-rg
+    resourceGroupName : ${{ vars.RESOURCE_GROUP_NAME }}
 
 on:
   push:
