@@ -46,11 +46,6 @@ resource webApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'AZURE_CONTAINER_NAME'
           value: storageContainerName
         }
-        // GitHub Actions 用: ZIP デプロイでパッケージから実行
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
-        }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'true'
