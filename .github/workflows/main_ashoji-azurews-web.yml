@@ -121,5 +121,5 @@ jobs:
             CLIENT_ID=${{ secrets.CLIENT_ID }} \
             TENANT_ID=${{ secrets.TENANT_ID }} \
             CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
-            AZURE_STORAGE_CONNECTION_STRING="${{ env.AZURE_STORAGE_CONNECTION_STRING }}" \
-            AZURE_CONTAINER_NAME=${{vars.AZURE_CONTAINER_NAME}}
+            # AZURE_STORAGE_CONNECTION_STRING="${{ env.AZURE_STORAGE_CONNECTION_STRING }}" \
+            # AZURE_CONTAINER_NAME=${{vars.AZURE_CONTAINER_NAME}}
