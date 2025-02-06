@@ -7,6 +7,7 @@ name: Build and deploy Python app to Azure Web App
 
 env:
     resourceGroupName : ${{ vars.RESOURCE_GROUP_NAME }}
+    isAuth : false # Microsoft Entra ID Auth
 
 on:
   push:
@@ -97,7 +98,7 @@ jobs:
       - name: 'Set environment variables'
         run: |
           az webapp config appsettings set --name ${{ vars.WEB_APP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
-            DISABLE_AUTH=false \
+            DISABLE_AUTH=${{env.isAuth}} \
             REDIRECT_URI=${{ secrets.REDIRECT_URI }} \
             FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} \
             CLIENT_ID=${{ secrets.CLIENT_ID }} \
