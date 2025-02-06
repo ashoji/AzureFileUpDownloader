@@ -100,7 +100,7 @@ jobs:
           AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
             --name ${{ env.STORAGE_ACCOUNT_NAME }} \
             --resource-group ${{ env.resourceGroupName }} \
-            --query connectionString -o tsv)
+            --query connectionString -o tsv)ddddd
           echo "AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}" >> $GITHUB_ENV
 
       # Azure Web Apps にデプロイ
