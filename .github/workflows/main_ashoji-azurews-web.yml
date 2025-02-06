@@ -81,10 +81,7 @@ jobs:
           az deployment group create \
             --resource-group ${{ env.resourceGroupName }} \
             --template-file deploy/azuredeploy.bicep
-            --parameters \
-              webAppName=${{ vars.WEB_APP_NAME }} \
-              storageAccountNamePrefix=${{ vars.STORAGE_ACCOUNT_NAME_PREFIX }} \
-              storageAccountContainer=${{ vars.STORAGE_ACCOUNT_CONTAINER }} 
+            --parameters webAppName=${{ vars.WEB_APP_NAME }} storageAccountNamePrefix=${{ vars.STORAGE_ACCOUNT_NAME_PREFIX }} storageAccountContainer=${{ vars.STORAGE_ACCOUNT_CONTAINER }} 
           
       # Azure Web Apps にデプロイ
       - name: 'Deploy to Azure Web App'
