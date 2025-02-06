@@ -36,3 +36,4 @@ module appServiceModule './appservice.bicep' = {
 
 output storageAccountName string = storageModule.outputs.storageAccountName
 output webAppUrl string = appServiceModule.outputs.webAppUrl
+output webAppName string = appServiceModule.outputs.webAppName
