@@ -7,7 +7,6 @@ name: Build and deploy Python app to Azure Web App
 
 env:
     resourceGroupName : ${{ vars.RESOURCE_GROUP_NAME }}
-    isAuth : false # Microsoft Entra ID Auth
 
 on:
   push:
@@ -82,7 +81,17 @@ jobs:
             --resource-group ${{ env.resourceGroupName }} \
             --template-file deploy/azuredeploy.bicep \
             --parameters webAppName=${{ vars.WEB_APP_NAME }} storageAccountNamePrefix=${{ vars.STORAGE_ACCOUNT_NAME_PREFIX }} storageAccountContainer=${{ vars.STORAGE_ACCOUNT_CONTAINER }} 
-          
+            
+      # Azure Web Apps 環境変数を設定
+      - name: 'Set environment variables'
+        run: |
+          az webapp config appsettings set --name ${{ vars.WEB_APP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
+            CLIENT_ID=${{ secrets.CLIENT_ID }} \
+            TENANT_ID=${{ secrets.TENANT_ID }} \
+            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
+            FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} \
+            REDIRECT_URI='${{ vars.REDIRECT_URI }}' \
+
       # Azure Web Apps にデプロイ
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -90,14 +99,3 @@ jobs:
         with:
           app-name: ${{ vars.WEB_APP_NAME }}
           slot-name: 'Production'
-
-      # Azure Web Apps 環境変数を設定
-      - name: 'Set environment variables'
-        run: |
-          az webapp config appsettings set --name ${{ vars.WEB_APP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
-            DISABLE_AUTH=${{ env.isAuth }} \
-            REDIRECT_URI='${{ vars.REDIRECT_URI }}' \
-            FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} \
-            CLIENT_ID=${{ secrets.CLIENT_ID }} \
-            TENANT_ID=${{ secrets.TENANT_ID }} \
-            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
