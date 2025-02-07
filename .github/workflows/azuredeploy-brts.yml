@@ -8,6 +8,7 @@ name: Build and deploy Python app to Azure Web App
 env:
     resourceGroupName : 'demo-rg'
     WEB_APP_NAME: 'webapplin-4dcnaw7p7eueademo'
+    REDIRECT_URI: "https://webapplin-4dcnaw7p7eueademo.azurewebsites.net/callback"
 
 on:
   push:
@@ -91,7 +92,7 @@ jobs:
             TENANT_ID=${{ secrets.TENANT_ID }} \
             CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
             FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} \
-            REDIRECT_URI='${{ vars.REDIRECT_URI }}' \
+            REDIRECT_URI='${{ env.REDIRECT_URI }}' \
 
       # Azure Web Apps にデプロイ
       - name: 'Deploy to Azure Web App'
