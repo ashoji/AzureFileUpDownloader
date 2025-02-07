@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App
 
 env:
     resourceGroupName : 'demo-rg'
-    WEB_APP_NAME: 'webapplin-4dcnaw7p7eueademo.azurewebsites.net'
+    WEB_APP_NAME: 'webapplin-4dcnaw7p7eueademo'
 
 on:
   push:
