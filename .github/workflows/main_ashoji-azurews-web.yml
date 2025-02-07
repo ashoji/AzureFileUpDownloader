@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App
 
 env:
     resourceGroupName : ${{ vars.RESOURCE_GROUP_NAME }}
-    isAuth : false # Microsoft Entra ID Auth
+    isAuth : true # Microsoft Entra ID Auth
 
 on:
   push:

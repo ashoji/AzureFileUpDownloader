@@ -3,7 +3,7 @@ param appServicePlanName string = 'AppServicePlan'
 param webAppName string
 param storageAccountName string
 param storageContainerName string = 'container'
-param linuxFxVersion string = 'PYTHON|3.11'
+param linuxFxVersion string = 'PYTHON|3.12'
 param appServiceSku string = 'B1'
 param appServiceSkuTier string = 'Basic'
 
@@ -35,7 +35,9 @@ resource webApp 'Microsoft.Web/sites@2024-04-01' = {
   kind: 'app,linux'
   properties: {
     serverFarmId: appServicePlan.id
+    httpsOnly: true
     siteConfig: {
+      ftpsState: 'Disabled'
       linuxFxVersion: linuxFxVersion
       appSettings: [
         {
@@ -46,11 +48,6 @@ resource webApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'AZURE_CONTAINER_NAME'
           value: storageContainerName
         }
-        // // GitHub Actions 用: ZIP デプロイでパッケージから実行
-        // {
-        //   name: 'WEBSITE_RUN_FROM_PACKAGE'
-        //   value: '1'
-        // }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'true'

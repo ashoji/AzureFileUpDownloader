@@ -29,7 +29,7 @@ module appServiceModule './appservice.bicep' = {
     location: location
     appServicePlanName: appServicePlanName
     webAppName: webAppName
-    linuxFxVersion: 'PYTHON|3.11'
+    linuxFxVersion: 'PYTHON|3.12'
     storageAccountName: storageModule.outputs.storageAccountName
     storageContainerName: storageAccountContainer
   }

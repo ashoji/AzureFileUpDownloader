@@ -13,7 +13,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     name: skuName
   }
   kind: kind
-  properties: {}
+  properties: {
+    minimumTlsVersion: 'TLS1_2'
+  }
 }
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
   parent: storageAccount
