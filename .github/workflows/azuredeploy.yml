@@ -99,4 +99,8 @@ jobs:
         with:
           app-name: ${{ vars.WEB_APP_NAME }}
           slot-name: 'Production'
+<<<<<<< HEAD:.github/workflows/main_ashoji-azurews-web.yml
           package: release.zip
+=======
+          package : release.zip
+>>>>>>> 5c4ffd82838835dff6ca5553fb86867a97ff0150:.github/workflows/azuredeploy.yml
