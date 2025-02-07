@@ -91,7 +91,7 @@ jobs:
           app-name: ${{ vars.WEB_APP_NAME }}
           slot-name: 'Production'
 
-      # 環境変数を設定
+      # Azure Web Apps 環境変数を設定
       - name: 'Set environment variables'
         run: |
           az webapp config appsettings set --name ${{ vars.WEB_APP_NAME }} --resource-group ${{ env.resourceGroupName }} --settings \
