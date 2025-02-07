@@ -6,12 +6,12 @@
 name: Build and deploy Python app to Azure Web App
 
 env:
-    resourceGroupName : ${{ vars.RESOURCE_GROUP_NAME }}
+    resourceGroupName : 'demo-rg'
 
 on:
   push:
     branches:
-      - cicd
+      - demo
   workflow_dispatch:
 
 permissions:
